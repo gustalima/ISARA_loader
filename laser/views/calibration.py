@@ -24,20 +24,20 @@ def main(stdscr):
         baskets[basket_n]["tilt"] = 1500
         baskets[basket_n]["pan"] = 1500
         SetAngle_tilt(baskets[basket_n]["tilt"])
-        # SetAngle_pan(baskets[basket_n]["pan"])
+        SetAngle_pan(baskets[basket_n]["pan"])
 
     def move_up():
         basket_n = current["pos"]
         print(f"moving up - basket {basket_n}")
         print(baskets[basket_n]["tilt"])
-        baskets[basket_n]["tilt"] += 5
+        baskets[basket_n]["tilt"] += 15
         SetAngle_tilt(baskets[basket_n]["tilt"])
 
     def move_up_half():
         basket_n = current["pos"]
         print(f"moving up - basket {basket_n}")
         print(baskets[basket_n]["tilt"])
-        baskets[basket_n]["tilt"] += 1
+        baskets[basket_n]["tilt"] += 5
         SetAngle_tilt(baskets[basket_n]["tilt"])
 
     def move_down():
@@ -45,14 +45,14 @@ def main(stdscr):
 
         print("moving down")
         print(baskets[basket_n]["tilt"])
-        baskets[basket_n]["tilt"] -= 5
+        baskets[basket_n]["tilt"] -= 15
         SetAngle_tilt(baskets[basket_n]["tilt"])
 
     def move_down_half():
         basket_n = current["pos"]
         print("moving down")
         print(baskets[basket_n]["tilt"])
-        baskets[basket_n]["tilt"] -= 1
+        baskets[basket_n]["tilt"] -= 5
         SetAngle_tilt(baskets[basket_n]["tilt"])
 
     def re_move():
@@ -60,19 +60,40 @@ def main(stdscr):
         SetAngle_tilt(1000)
         sleep(0.5)
         SetAngle_tilt(baskets[basket_n]["tilt"])
-
-        # SetAngle_pan(tilt_pan["pan"])
+        SetAngle_pan(baskets[basket_n]["pan"])
 
     def move_left():
+        basket_n = current["pos"]
         print("moving left")
+        print(baskets[basket_n]["pan"])
+        baskets[basket_n]["pan"] -= 15
+        SetAngle_pan(baskets[basket_n]["pan"])
+
+    def move_left_half():
+        basket_n = current["pos"]
+        print("moving left")
+        print(baskets[basket_n]["pan"])
+        baskets[basket_n]["pan"] -= 5
+        SetAngle_pan(baskets[basket_n]["pan"])
 
     def move_right():
+        basket_n = current["pos"]
         print("moving right")
+        print(baskets[basket_n]["pan"])
+        baskets[basket_n]["pan"] += 15
+        SetAngle_pan(baskets[basket_n]["pan"])
+
+    def move_right_half():
+        basket_n = current["pos"]
+        print("moving right")
+        print(baskets[basket_n]["pan"])
+        baskets[basket_n]["pan"] += 5
+        SetAngle_pan(baskets[basket_n]["pan"])
 
     def next_basket():
         current["pos"] += 1
 
-        if current["pos"] == 5:
+        if current["pos"] == 30:
             current["pos"] = 1
         cp = current["pos"]
         re_move()
@@ -81,7 +102,7 @@ def main(stdscr):
     def previous_basket():
         current["pos"] -= 1
         if current["pos"] == 0:
-            current["pos"] = 4
+            current["pos"] = 29
         cp = current["pos"]
         re_move()
         print(f"Current basket {cp}")
@@ -97,7 +118,7 @@ def main(stdscr):
     basket_n = current["pos"]
     print(f"Current basket {basket_n}")
     SetAngle_tilt(baskets[basket_n]["tilt"])
-    # SetAngle_pan(baskets[basket_n]["pan"])
+    SetAngle_pan(baskets[basket_n]["pan"])
     while True:
         # get keyboard input, returns -1 if none available
         c = stdscr.getch()
@@ -106,10 +127,22 @@ def main(stdscr):
             # stdscr.addstr(str(c) + " ")
             stdscr.addstr(str(c) + " ")
             stdscr.refresh()
+            if c == 105:  # kp 8
+                move_up_half()
+            if c == 107:  # kp 2
+                move_down_half()
             if c == 56:  # kp 8
                 move_up_half()
             if c == 50:  # kp 2
                 move_down_half()
+            if c == 54:  # kp 8
+                move_right_half()
+            if c == 108:  # kp 2
+                move_right_half()
+            if c == 52:  # kp 8
+                move_left_half()
+            if c == 106:  # kp 2
+                move_left_half()
             if c == 259:  # up
                 move_up()
             if c == 258:  # down
