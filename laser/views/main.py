@@ -2,12 +2,12 @@ from django.shortcuts import render
 import requests
 import os
 import time
-
+import json
 from laser.views.staff import staff_list
 from laser.views.auth import authenticate, check_token, url, site, proxies
 from laser.views.proposals import get_staff_all_proposals, get_proposals
 from laser.views.ISARA import get_puck_states, get_next_empty_placeholder
-from laser.views.servo import SetAngle_tilt, get_baskets_positions  # , SetAngle_pan
+from laser.views.servo import SetAngle_tilt, get_baskets_positions, SetAngle_pan
 from laser.views.dewar_load import (
     get_samples_in_puck,
     unload_all_pucks,
@@ -18,6 +18,7 @@ from laser.views.dewar_load import (
     get_shipping_names_and_Ids,
 )
 
+ISARA_basket_bypass = True
 
 token = ""
 
@@ -114,6 +115,14 @@ def duo_logout(request):
 
 def safe_pucks(request):
     ISARA_pos = str(request.GET.get("savebtn"))
+    updated_definitions = str(request.GET.get("updateDefBtn"))
+    reboot_server = str(request.GET.get("rebootRPIbtn"))
+    if updated_definitions == "Update-baskets":
+        print("New baskets definitions")
+        baskets = get_baskets_positions()
+    if reboot_server == "Reboot-now":
+        print("reboot time")
+        os.system("reboot now")
     puck_states = get_puck_states(ISARA_pos)
     return render(request, "laser/safe_pucks.html", puck_states,)
 
@@ -191,14 +200,18 @@ def load_isara(request):
     if "None" not in puckposition:
         puckposition = puckposition.replace("position", "")
         pos = int(puckposition)
+        print("moving laser to position " + str(pos))
+        print(baskets[pos]["tilt"])
+        print(baskets[pos]["pan"])
         SetAngle_tilt(baskets[pos]["tilt"])
-        # SetAngle_tilt(baskets[pos]["pan"])
+        SetAngle_pan(baskets[pos]["pan"])
 
-    # out = requests.post(url_jive, data=json.dumps(q), verify=False).json()
+    out = requests.post(url_jive, data=json.dumps(q), verify=False).json()
 
-    # active = out["data"]["device"]["attributes"][0]["value"]
-
-    active = 10 * [0] + 7 * [1] + 2 * [0] + 10 * [1]
+    if ISARA_basket_bypass:
+        active = 29 * [0]
+    else:
+        active = out["data"]["device"]["attributes"][0]["value"]
 
     activeList = list()
     for i in active:
@@ -261,8 +274,11 @@ def load_isara(request):
                     print("Next available position is ")
                     print(next_empty)
                     pos = int(next_empty)
+                    print("moving laser to position " + str(pos))
+                    print(baskets[pos]["tilt"])
+                    print(baskets[pos]["pan"])
                     SetAngle_tilt(baskets[pos]["tilt"])
-                    # SetAngle_tilt(baskets[pos]["pan"])
+                    SetAngle_pan(baskets[pos]["pan"])
                     # print(shippingName)
                     # print(next_empty)
                     puck_mounted_dict[containerId] = next_empty
@@ -271,8 +287,11 @@ def load_isara(request):
                     pos = SC_position
                     try:
                         pos = int(pos)
+                        print("moving laser to position " + str(pos))
+                        print(baskets[pos]["tilt"])
+                        print(baskets[pos]["pan"])
                         SetAngle_tilt(baskets[pos]["tilt"])
-                        # SetAngle_tilt(baskets[pos]["pan"])
+                        SetAngle_pan(baskets[pos]["pan"])
                     except:
                         pass
         else:
