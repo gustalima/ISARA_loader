@@ -3,6 +3,74 @@
 <head>
     <title> ISARA Sample Changer </title>
     <style>
+    
+    .switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #8abf26;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked+.slider {
+  background-color: #ccc;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #ccc;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+
+/* Rounded sliders */
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+
+
+
+
+
+
       .whole-page{
             zoom: 80%;
 
@@ -172,7 +240,13 @@
             padding:10px 16px;
             text-decoration:none;
             margin-top: 5px;
+            width: 200px
           }
+        .flex-dewars {
+          display:flex;
+          flex-wrap: wrap;
+
+        }
         .dewarButton:hover {
           background-color:#c5c5c5;
           }
@@ -317,6 +391,7 @@
 
         }
     </style>
+  <script src="/static/jquery-3.5.1.min.js"></script>
 
 </head>
 
@@ -410,14 +485,8 @@
               <p style="padding-right: 12px;"> Disabled</p>
             </div>
           </div>
-          <div style="line-height: 0;">Proposal: {{proposal}}</div><br>
+          <div>Proposal: {{proposal}}</div><br>
           {% comment %} Selected shipment: {{select_shipment}} {% endcomment %}
-          <form action="/isara" method="get" id="shipment_form" >
-          {% for key,value in shipments.items %}
-            <button class="button dewarButton" id="{{key}}" value="{{key}}" onclick="overlayon()" name="select_shipment"> {{key}} </button>
-          {% endfor %}
-          </form>
-          
           {% comment %} Selected puck: {{containerId}}   {% endcomment %}
           <form action="/isara/" method="get" id="puck_form" >
           <div class="pucks-in-dewar">
@@ -455,7 +524,23 @@
           </div>
           </form>
           
-        </div>
+          </div>
+          <div style="display: inline-flex;">
+          
+          <label class="switch">
+            <input id="toggle" type="checkbox">
+            <span class="slider round"></span>
+          </label>
+          <p id="toggle-text" style="position:relative; bottom: 13px; left: 10px; font-family: Arial" unchecked>Toggle shipments</p>
+          </div>
+          <div id="dewars-div" class="flex-dewars">
+          <form action="/isara" method="get" id="shipment_form" >
+          {% for key,value in shipments.items %}
+            <button class="button dewarButton" id="{{key}}" value="{{key}}" onclick="overlayon()" name="select_shipment"> {{key}} </button>
+          {% endfor %}
+          </form>
+          </div>
+          
     </center>
 </body>
 
@@ -491,9 +576,30 @@ function update_mounted_pucks(containerId,position){
 if ("{{select_shipment}}"!== "None"){
   document.getElementById("{{select_shipment}}").setAttribute("style", "background-color: #feb627 !important; border: 1px solid #fea901")
 }
+
+
 if("{{containerId}}" !== "None"){
   color_selected()
 }
+
+</script>
+<script>
+$('#toggle').on('click', function(){
+    
+
+    if ( $(this).is(':checked') ) {
+        $('#dewars-div').hide();
+    } 
+    else {
+        $('#dewars-div').show();
+    }
+    
+
+    
+    
+    
+});
+
 
 </script>
 
